@@ -1,37 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'Home_Screen.dart';
+import 'HomeScreens/Home_Screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple,
       body: Center(
         child: Text(
-          "🧩 MindPlay",
+          '🧩 MindPlay',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 36,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+            letterSpacing: 1.2,
           ),
         ),
       ),

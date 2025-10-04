@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class PlaceholderScreen extends StatelessWidget {
+class SudokuScreen extends StatelessWidget {
   final String title;
-  const PlaceholderScreen({super.key, required this.title});
+  const SudokuScreen({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

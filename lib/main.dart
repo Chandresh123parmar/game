@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'Screen/Splash_Screen.dart';
+import 'helper/DB_helper.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.instance.initDB();
   runApp(const MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
