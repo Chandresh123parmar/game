@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../main.dart';
 import 'Tic_tac_Toe_Screen.dart';
 
 class TicTacToeHome extends StatefulWidget {
@@ -15,72 +14,81 @@ class _TicTacToeHomeState extends State<TicTacToeHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text('Tic Tac Toe'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 8),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildModeButton('Single Player', isSinglePlayer, true),
-                const SizedBox(height: 16),
-                _buildModeButton('Player vs Player', !isSinglePlayer, false),
-              ],
-            ),
-            const SizedBox(height: 30),
-            TextField(
-              controller: playerController,
-              decoration: const InputDecoration(
-                  labelText: 'Player 1 (X)', border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: opponentController,
-              decoration: InputDecoration(
-                  labelText:
-                  isSinglePlayer ? 'Opponent (Computer - O)' : 'Player 2 (O)',
-                  border: const OutlineInputBorder()),
-              enabled: !isSinglePlayer ? true : false,
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                final p1 = playerController.text.trim().isEmpty
-                    ? 'Player X'
-                    : playerController.text.trim();
-                final p2 = isSinglePlayer
-                    ? (opponentController.text.trim().isEmpty
-                    ? 'Computer'
-                    : opponentController.text.trim())
-                    : (opponentController.text.trim().isEmpty
-                    ? 'Player O'
-                    : opponentController.text.trim());
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TicTacToeScreen(
-                      playerX: p1,
-                      playerO: p2,
-                      singlePlayer: isSinglePlayer,
-                    ),
-                  ),
-                );
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: Scaffold(
+        appBar: AppBar(
+            title: const Text('Tic-Tac-Toe'),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+              onPressed: (){
+                Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade900,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  minimumSize: const Size(double.infinity, 50)),
-              child: Text('Start Game',style: TextStyle(color: Colors.green,fontSize: 20,fontWeight: FontWeight.w500),),
-            ),
-          ],
+              icon: Icon(Icons.arrow_back_ios)),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 8),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildModeButton('Single Player', isSinglePlayer, true),
+                  const SizedBox(height: 20),
+                  _buildModeButton('Player vs Player', !isSinglePlayer, false),
+                ],
+              ),
+              const SizedBox(height: 30),
+              TextField(
+                controller: playerController,
+                decoration: const InputDecoration(
+                    labelText: 'Player 1 (X)', border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: opponentController,
+                decoration: InputDecoration(
+                    labelText:
+                    isSinglePlayer ? 'Opponent (Computer - O)' : 'Player 2 (O)',
+                    border: const OutlineInputBorder()),
+                enabled: !isSinglePlayer ? true : false,
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  final p1 = playerController.text.trim().isEmpty
+                      ? 'Player X'
+                      : playerController.text.trim();
+                  final p2 = isSinglePlayer
+                      ? (opponentController.text.trim().isEmpty
+                      ? 'Computer'
+                      : opponentController.text.trim())
+                      : (opponentController.text.trim().isEmpty
+                      ? 'Player O'
+                      : opponentController.text.trim());
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TicTacToeScreen(
+                        playerX: p1,
+                        playerO: p2,
+                        singlePlayer: isSinglePlayer,
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade900,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    minimumSize: const Size(double.infinity, 50)),
+                child: Text('Start Game',style: TextStyle(color: Colors.green,fontSize: 20,fontWeight: FontWeight.w500),),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -97,8 +105,8 @@ class _TicTacToeHomeState extends State<TicTacToeHome> {
           boxShadow: selected
               ? [
             BoxShadow(
-              color: Colors.deepPurple.withOpacity(0.5),
-              offset: const Offset(0, 4),
+              color: Colors.deepPurple.withOpacity(0.9),
+              offset: const Offset(0, 6),
               blurRadius: 6,
             ),
           ]
@@ -109,7 +117,7 @@ class _TicTacToeHomeState extends State<TicTacToeHome> {
           style: TextStyle(
             color: selected ? Colors.white : Colors.black87,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 17,
           ),
         ),
       ),

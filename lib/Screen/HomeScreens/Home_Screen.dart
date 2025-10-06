@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:game/Screen/HomeScreens/tic_tac_toe_home_Screen.dart';
-
-import 'Leaderboard_Screen.dart';
 import 'Memory_Match_Screen.dart';
-//import 'Sudoku_Home_Screen.dart';
-import 'Sudoku_Screen.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,8 +14,7 @@ class HomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
+          crossAxisCount: 1,
           mainAxisSpacing: 16,
           children: [
             _buildTile(
@@ -31,16 +27,6 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const TicTacToeHome()),
               ),
             ),
-            /*_buildTile(
-              context,
-              title: 'Sudoku',
-              icon: Icons.table_rows,
-              color: Colors.orange,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SudokuHomeScreen()),
-              ),
-            ),*/
             _buildTile(
               context,
               title: 'Memory Match',
@@ -49,16 +35,6 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const MemoryMatchScreen()),
-              ),
-            ),
-            _buildTile(
-              context,
-              title: 'Leaderboard',
-              icon: Icons.leaderboard,
-              color: Colors.purple,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
               ),
             ),
           ],
@@ -84,10 +60,10 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: color),
+            Icon(icon, size: 50, color: color),
             const SizedBox(height: 12),
             Text(title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: color)),
           ],
         ),
       ),

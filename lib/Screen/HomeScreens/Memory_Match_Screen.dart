@@ -70,7 +70,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("🎉 You Won!"),
+        title: const Text("You Won!"),
         content: Text("Your score: $_score"),
         actions: [
           TextButton(
@@ -79,7 +79,13 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
               _generateCards();
             },
             child: const Text("Play Again"),
-          )
+          ),
+          TextButton(
+              onPressed: (){
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: Text('Exit'))
         ],
       ),
     );
@@ -91,10 +97,16 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
       appBar: AppBar(
         title: const Text("🧠 Memory Match"),
         centerTitle: true,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+            onPressed: (){
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios)),
         actions: [
           IconButton(
             onPressed: _generateCards,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh,color: Colors.lightGreen,),
           )
         ],
       ),
@@ -113,55 +125,71 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
                 Text(
                   "Score: $_score",
                   style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold),
+                    color: Colors.amber,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: gridSize * 0.9,
-                  width: gridSize * 0.8,
-                  child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: _cards.length,
-                    itemBuilder: (context, index) {
-                      final card = _cards[index];
-                      return GestureDetector(
-                        onTap: () => _onCardTap(index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          decoration: BoxDecoration(
-                            color: card.isFlipped || card.isMatched
-                                ? Colors.white
-                                : Colors.blueAccent,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: Offset(2, 2))
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            card.isFlipped || card.isMatched ? card.icon : '',
-                            style: TextStyle(
-                              fontSize: gridSize * 0.09,
-                            ),
-                          ),
+                Card(
+                  color: Colors.white70,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: gridSize * 0.80,
+                      width: gridSize * 0.8,
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 9,
+                          mainAxisSpacing: 9,
                         ),
-                      );
-                    },
+                        itemCount: _cards.length,
+                        itemBuilder: (context, index) {
+                          final card = _cards[index];
+                          return GestureDetector(
+                            onTap: () => _onCardTap(index),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              decoration: BoxDecoration(
+                                color: card.isFlipped || card.isMatched
+                                    ? Colors.white
+                                    : Colors.blueAccent,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [
+                                  BoxShadow(
+                                      color: Colors.black54,
+                                      blurRadius: 2,
+                                    offset: Offset(6,5),
+                                  )
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                card.isFlipped || card.isMatched ? card.icon : '',
+                                style: TextStyle(
+                                  fontSize: gridSize * 0.08,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black38,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+
+                    )
+                  ),
                   onPressed: _generateCards,
-                  icon: const Icon(Icons.restart_alt),
-                  label: const Text("Reset Game"),
+                  icon: const Icon(Icons.restart_alt,color: Colors.deepOrangeAccent,),
+                  label: const Text("Reset Game",style: TextStyle(color: Colors.deepOrangeAccent),),
                 )
               ],
             ),
