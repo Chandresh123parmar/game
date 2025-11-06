@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/Screen/HomeScreens/tic_tac_toe_home_Screen.dart';
 import 'Memory_Match_Screen.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final tileStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
     return Scaffold(
       appBar: AppBar(title: const Text('MindPlay')),
       body: Padding(
@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
             _buildTile(
               context,
               title: 'Tic Tac Toe',
-              icon: Icons.grid_on,
+              image: AssetImage('assets/images/tictac.png'),
               color: Colors.blue,
               onTap: () => Navigator.push(
                 context,
@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
             _buildTile(
               context,
               title: 'Memory Match',
-              icon: Icons.memory,
+              image: AssetImage('assets/images/match.png'),
               color: Colors.green,
               onTap: () => Navigator.push(
                 context,
@@ -43,11 +43,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTile(BuildContext context,
-      {required String title,
-        required IconData icon,
+  Widget _buildTile(
+      BuildContext context, {
+        required String title,
+        required AssetImage image,
         required Color color,
-        required VoidCallback onTap}) {
+        required VoidCallback onTap,
+      }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -60,10 +62,16 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 50, color: color),
+            Image.asset(image.assetName,width: 100,),
             const SizedBox(height: 12),
-            Text(title,
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: color)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
           ],
         ),
       ),

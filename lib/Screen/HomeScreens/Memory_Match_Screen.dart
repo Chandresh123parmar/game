@@ -95,7 +95,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("🧠 Memory Match"),
+        title: const Text("Memory Match"),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
