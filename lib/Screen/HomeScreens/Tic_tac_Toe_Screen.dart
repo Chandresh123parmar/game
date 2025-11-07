@@ -1,15 +1,17 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../helper/DB_helper.dart';
-import '../../main.dart';
-
 
 class TicTacToeScreen extends StatefulWidget {
   final String playerX;
   final String playerO;
   final bool singlePlayer;
-  const TicTacToeScreen({super.key, required this.playerX, required this.playerO, required this.singlePlayer});
+  const TicTacToeScreen({
+    super.key,
+    required this.playerX,
+    required this.playerO,
+    required this.singlePlayer,
+  });
 
   @override
   State<TicTacToeScreen> createState() => _TicTacToeScreenState();
@@ -41,7 +43,6 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
     });
     await checkStateAfterMove();
 
-    // If single player and game not over and it's AI's turn -> AI move
     if (widget.singlePlayer && !gameOver && !isXTurn) {
       await Future.delayed(const Duration(milliseconds: 400));
       await aiMove();
@@ -54,7 +55,6 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
       gameOver = true;
       final winnerName = winner == 'X' ? widget.playerX : widget.playerO;
       if (winner != 'D') {
-        // save 1 point for winner
         await DatabaseHelper.instance.insertWin(winnerName, 1);
         final total = await DatabaseHelper.instance.totalPoints(winnerName);
         await showResultDialog('$winnerName Wins!', 'Total Score: $total');
@@ -70,22 +70,40 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(subtitle),
+        backgroundColor: Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          title,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          subtitle,
+          style: TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               restartRound();
             },
-            child: const Text('Play Again'),
+            style: TextButton.styleFrom(
+              backgroundColor: Color(0xFF2563EB),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Play Again', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text('Exit'),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.1),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Exit', style: TextStyle(color: Colors.white70)),
           ),
         ],
       ),
@@ -94,32 +112,26 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
 
   String _checkWinner() {
     List<List<int>> winPatterns = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
     ];
     for (var p in winPatterns) {
       final a = board[p[0]];
       if (a != '' && a == board[p[1]] && a == board[p[2]]) {
-        return a; // 'X' or 'O'
+        return a;
       }
     }
-    if (!board.contains('')) return 'D'; // Draw
+    if (!board.contains('')) return 'D';
     return '';
   }
 
-  // Simple smart AI: try win -> block -> center -> random
   Future<void> aiMove() async {
     int? move;
-    // try to win
     move = findWinningMove('O');
-    // block player
     move ??= findWinningMove('X');
-    // take center
     move ??= (board[4] == '') ? 4 : null;
-    // corner preference
-    move ??= pickRandomFrom([0,2,6,8].where((i) => board[i] == '').toList());
-    // random
+    move ??= pickRandomFrom([0, 2, 6, 8].where((i) => board[i] == '').toList());
     move ??= pickRandomFrom(List.generate(9, (i) => i).where((i) => board[i] == '').toList());
     if (move != null) {
       setState(() {
@@ -132,9 +144,9 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
 
   int? findWinningMove(String player) {
     List<List<int>> winPatterns = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
     ];
     for (var p in winPatterns) {
       final vals = [board[p[0]], board[p[1]], board[p[2]]];
@@ -154,153 +166,395 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sw = MediaQuery.of(context).size.width ;
+    final sw = MediaQuery.of(context).size.width;
     final sh = MediaQuery.of(context).size.height;
     final boardSize = (sw < sh) ? sw * 0.85 : sh * 0.6;
-    final cellSize = boardSize / 3;
 
     return Scaffold(
-      appBar: AppBar(
-          title: const Text('Tic Tac Toe'),
-      centerTitle: true,),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            Text(widget.singlePlayer ? 'Single Player' : 'Player vs Player',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(isXTurn ? '${widget.playerX}\'s Turn (X)' : '${widget.playerO}\'s Turn (O)',
-                style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: boardSize,
-                height: boardSize,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade600,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                  ),
-                  itemCount: 9,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () async {
-                        if (widget.singlePlayer) {
-                          // only allow player taps when it's X's turn
-                          if (!isXTurn || gameOver) return;
-                          await handleTap(index);
-                        } else {
-                          // PvP: both players can tap
-                          if (gameOver) return;
-                          await handleTap(index);
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(6),
-                        width: cellSize,
-                        height: cellSize,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1E3A8A),
+              Color(0xFF0F172A),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom AppBar
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white70,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black12),
-                          boxShadow: [
-                            BoxShadow(blurRadius: 20)
-                          ]
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Center(
-                          child: Text(
-                            board[index],
-                            style: TextStyle(
-                              fontSize: cellSize * 0.30,
-                              fontWeight: FontWeight.bold,
-                              color: board[index] == 'X' ? Colors.blue : Colors.red,
-                            ),
+                        child: Icon(Icons.arrow_back, color: Colors.white),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          widget.singlePlayer ? 'vs Computer' : 'Player vs Player',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                    SizedBox(width: 48),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 15,
-              alignment: WrapAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)
-                    )
-                  ),
-                    onPressed: restartRound, 
-                    child: const Text('Restart Round',style: TextStyle(color: Colors.lightGreen),)),
-                ElevatedButton(
-                  onPressed: () async {
-                    await DatabaseHelper.instance.resetAllScores();
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All scores cleared')));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)
+
+              // Player Indicators
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: isXTurn
+                              ? LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF1E40AF)])
+                              : null,
+                          color: isXTurn ? null : Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isXTurn ? Color(0xFF2563EB) : Colors.white.withOpacity(0.1),
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'X',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2563EB),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              widget.playerX,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: isXTurn ? FontWeight.bold : FontWeight.normal,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text('Reset Scores',style: TextStyle(color: Colors.red),),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: !isXTurn
+                              ? LinearGradient(colors: [Color(0xFFEA580C), Color(0xFFC2410C)])
+                              : null,
+                          color: !isXTurn ? null : Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: !isXTurn ? Color(0xFFEA580C) : Colors.white.withOpacity(0.1),
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'O',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFEA580C),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              widget.playerO,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: !isXTurn ? FontWeight.bold : FontWeight.normal,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-        
-                Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)
-                      )
-                    ),
-                    onPressed: () async {
-                      // quick show top players
-                      final top = await DatabaseHelper.instance.topPlayers();
-                      if (!mounted) return;
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Top Players'),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: top.isEmpty
-                                ? const Text('No scores yet')
-                                : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: top.length,
-                              itemBuilder: (c, i) {
-                                final r = top[i];
-                                return Card(
-                                  //color: Colors.white70,
-                                  child: ListTile(
-                                    leading: Text('#${i + 1}'),
-                                    title: Text(r['name'],style: TextStyle(fontSize: 12),),
-                                    trailing: Text('Score: ${r['score']}'),
-                                  ),
-                                );
-                              },
+              ),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 30),
+                      // Game Board
+                      Center(
+                        child: Container(
+                          width: boardSize,
+                          height: boardSize,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.1),
+                              width: 2,
                             ),
                           ),
-                          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+                          child: GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                            ),
+                            itemCount: 9,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  if (widget.singlePlayer) {
+                                    if (!isXTurn || gameOver) return;
+                                    await handleTap(index);
+                                  } else {
+                                    if (gameOver) return;
+                                    await handleTap(index);
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: board[index] == 'X'
+                                        ? LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF1E40AF)])
+                                        : board[index] == 'O'
+                                        ? LinearGradient(colors: [Color(0xFFEA580C), Color(0xFFC2410C)])
+                                        : null,
+                                    color: board[index] == '' ? Colors.white.withOpacity(0.05) : null,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: board[index] != ''
+                                        ? [
+                                      BoxShadow(
+                                        color: board[index] == 'X'
+                                            ? Color(0xFF2563EB).withOpacity(0.3)
+                                            : Color(0xFFEA580C).withOpacity(0.3),
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ]
+                                        : [],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      board[index],
+                                      style: TextStyle(
+                                        fontSize: boardSize * 0.12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      );
-                    },
-                    child: const Text('Leaderboard',style: TextStyle(color: Colors.amber),),
+                      ),
+
+                      SizedBox(height: 24),
+
+                      // Action Buttons
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF2563EB),
+                                      padding: EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: restartRound,
+                                    icon: Icon(Icons.refresh, color: Colors.white),
+                                    label: Text('Restart', style: TextStyle(color: Colors.white)),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFFEA580C),
+                                      padding: EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      final top = await DatabaseHelper.instance.topPlayers();
+                                      if (!mounted) return;
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          backgroundColor: Color(0xFF1E293B),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          title: Row(
+                                            children: [
+                                              Icon(Icons.emoji_events, color: Color(0xFFEA580C)),
+                                              SizedBox(width: 8),
+                                              Text('Leaderboard', style: TextStyle(color: Colors.white)),
+                                            ],
+                                          ),
+                                          content: SizedBox(
+                                            width: double.maxFinite,
+                                            child: top.isEmpty
+                                                ? Text('No scores yet', style: TextStyle(color: Colors.white70))
+                                                : ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: top.length,
+                                              itemBuilder: (c, i) {
+                                                final r = top[i];
+                                                return Container(
+                                                  margin: EdgeInsets.only(bottom: 8),
+                                                  padding: EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withOpacity(0.05),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 32,
+                                                        height: 32,
+                                                        decoration: BoxDecoration(
+                                                          color: i == 0
+                                                              ? Color(0xFFEA580C)
+                                                              : Color(0xFF2563EB),
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            '#${i + 1}',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                      Expanded(
+                                                        child: Text(
+                                                          r['name'],
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 6,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Color(0xFFEA580C).withOpacity(0.2),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        child: Text(
+                                                          '${r['score']}',
+                                                          style: TextStyle(
+                                                            color: Color(0xFFEA580C),
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: Text('Close', style: TextStyle(color: Colors.white)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    icon: Icon(Icons.emoji_events, color: Colors.white),
+                                    label: Text('Board', style: TextStyle(color: Colors.white)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade900,
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  await DatabaseHelper.instance.resetAllScores();
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('All scores cleared'),
+                                      backgroundColor: Colors.red.shade900,
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.delete_forever, color: Colors.white),
+                                label: Text('Reset All Scores', style: TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
